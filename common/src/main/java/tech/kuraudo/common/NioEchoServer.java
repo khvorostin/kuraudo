@@ -74,7 +74,7 @@ public class NioEchoServer {
             byteBuffer.flip();
             while (byteBuffer.hasRemaining()) {
                 // читаем побайтово, если получен символ перевода строки,
-                // возвращаем собранные данные данны
+                // возвращаем собранную строку
                 nextByte = byteBuffer.get();
                 if (nextByte != nByte) {
                     echoByteBuffer.put(nextByte);
