@@ -31,30 +31,31 @@ public class NettyEchoServer {
             serverBootstrap.group(acceptor, client)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer< NioSocketChannel >() {
+                    // Использую стрим для хранения пришедших байтов
                     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     @Override
                     protected void initChannel(NioSocketChannel ch) {
                         ch.pipeline().addLast(
+                            // Внутри InboundHandler'а переопределяю только channelRead()
                             new ChannelInboundHandlerAdapter() {
                                 @Override
-                                public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                                public void channelRead(ChannelHandlerContext ctx, Object msg) {
                                     final ByteBuf message = (ByteBuf) msg;
                                     while (message.isReadable()) {
+                                        // Здесь проверка полученного байта
                                         byte b = message.readByte();
                                         if ((char)b != '\n') {
                                             baos.write(b);
                                         } else {
+                                            // Создаю новый ByteBuf (беру не из потока) для возврата данных клиенту
                                             ByteBuf echo = Unpooled.wrappedBuffer(baos.toByteArray());
+                                            // Очищаю стрим для повторного использования
                                             baos.reset();
+                                            // Из текущего контекста получаю канал и отправляю в него сообщение
                                             ctx.channel().writeAndFlush(echo);
                                         }
                                     }
                                     ReferenceCountUtil.release(msg); // очистка буфера
-                                }
-
-                                @Override
-                                public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                                    System.out.println(cause);
                                 }
                             }
                         );
