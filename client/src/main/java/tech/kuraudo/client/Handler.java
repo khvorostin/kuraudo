@@ -100,5 +100,4 @@ public class Handler implements Runnable {
         messagePool.put(Messager.MODULE_NAME, new RequestToCopy(pathOnServer, pathOnClient));
         this.appState = AppState.WAITING_FOR_DOWNLOADING;
     }
-
 }

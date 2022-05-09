@@ -67,7 +67,6 @@ public class Messager implements Runnable{
                             new JsonDecoder(),
                             new JsonEncoder(),
                             new SimpleChannelInboundHandler<Message>() {
-
                                 @Override
                                 protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
 
