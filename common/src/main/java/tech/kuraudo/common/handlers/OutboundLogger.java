@@ -13,7 +13,10 @@ public class OutboundLogger extends StringEncoder {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, CharSequence msg, List< Object > out) throws Exception {
-        System.out.println("OUTBOUND LOGGER: " + msg);
+        if (msg.toString().contains("LogMessage")) {
+            System.out.println("OUTBOUND LOGGER: " + msg);
+        }
+
         super.encode(ctx, msg, out);
     }
 }
