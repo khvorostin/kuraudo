@@ -14,16 +14,15 @@ import tech.kuraudo.common.handlers.JsonEncoder;
 import tech.kuraudo.common.handlers.OutboundLogger;
 import tech.kuraudo.common.message.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 
 /**
  * Класс, отвечающий за сетевые взаимодействия на клиенте. С данными от пользователя работает
  * через пул сообщений {@link MessagePool}.
  */
 public class Messager implements Runnable{
+
+    private RandomAccessFile accessFile;
 
     /**
      * Название блока кода, которое используется в пуле сообщений для обозначения получателей сообщений.
@@ -120,20 +119,59 @@ public class Messager implements Runnable{
                 }
 
                 // Запрос на загрузку файла с сервера
-                if (message instanceof RequestToCopy requestToCopy) {
+                if (message instanceof RequestToDownload requestToDownload) {
                     // запоминаем путь к файлу на клиенте
-                    filePath = requestToCopy.getPathOnClient();
+                    filePath = requestToDownload.getPathOnClient();
                     // запрашиваем файл с сервера
-                    FileRequestMessage fileRequestMessage = new FileRequestMessage(requestToCopy.getPathOnServer());
+                    FileRequestMessage fileRequestMessage = new FileRequestMessage(requestToDownload.getPathOnServer());
                     channel.writeAndFlush(fileRequestMessage);
+                }
+
+                // Запрос на загрузку файла на сервер
+                if (message instanceof RequestToUpload requestToUpload) {
+                    final File file = new File(requestToUpload.getPathOnClient());
+                    if (file.exists()) {
+                        accessFile = new RandomAccessFile(file, "r");
+                        sendFile(channel, requestToUpload.getPathOnServer());
+                    }
                 }
             }
 
             channel.closeFuture().sync();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         } finally {
             worker.shutdownGracefully();
+        }
+    }
+
+    private void sendFile(Channel channel, String pathOnServer) throws IOException {
+        if (accessFile == null) {
+            return;
+        }
+
+        final byte[] fileContent;
+        final long available = accessFile.length() - accessFile.getFilePointer();
+
+        if (available > 64 * 1024) {
+            fileContent = new byte[64 * 1024];
+        } else {
+            fileContent = new byte[(int) available];
+        }
+
+        final long startPosition = accessFile.getFilePointer();
+        accessFile.read(fileContent);
+        final boolean last = (accessFile.getFilePointer() == accessFile.length());
+        UploadContentMessage message = new UploadContentMessage(pathOnServer, fileContent, startPosition, last);
+        channel.writeAndFlush(message).addListener((ChannelFutureListener) future -> {
+            if (!last) {
+                sendFile(channel, pathOnServer);
+            }
+        });
+
+        if (last) {
+            accessFile.close();
+            accessFile = null;
         }
     }
 }

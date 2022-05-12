@@ -93,11 +93,23 @@ public class Handler implements Runnable {
      * меняется на "Ожидание скачивания", что необходимо для вывода сообщений об успешности операции.
      */
     private void askToMoveFile() {
-        System.out.print("Enter path to file on server: ");
-        String pathOnServer = scanner.next();
-        System.out.print("Enter path to new file on client: ");
-        String pathOnClient = scanner.next();
-        messagePool.put(Messager.MODULE_NAME, new RequestToCopy(pathOnServer, pathOnClient));
-        this.appState = AppState.WAITING_FOR_DOWNLOADING;
+        System.out.print("Choose [1] for download file from server or [2] for upload to server: ");
+        int choose = scanner.nextInt();
+        if (choose == 1 || choose == 2) {
+            System.out.print("Enter path to file on server: ");
+            String pathOnServer = scanner.next();
+            System.out.print("Enter path to new file on client: ");
+            String pathOnClient = scanner.next();
+            switch (choose) {
+                case 1 -> {
+                    messagePool.put(Messager.MODULE_NAME, new RequestToDownload(pathOnServer, pathOnClient));
+                    this.appState = AppState.WAITING_FOR_DOWNLOADING;
+                }
+                case 2 -> {
+                    messagePool.put(Messager.MODULE_NAME, new RequestToUpload(pathOnServer, pathOnClient));
+                    this.appState = AppState.WAITING_FOR_UPLOADING;
+                }
+            }
+        }
     }
 }

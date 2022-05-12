@@ -4,8 +4,7 @@ package tech.kuraudo.common.message;
  * Запрос на загрузку файла с сервера на клиент или с клиента на сервер. Передаётся из модуля, отвечающего
  * за взаимодействие с пользователем, в модуль, отвечающий за общение с сервером.
  */
-@InnerMessage
-public class RequestToCopy extends Message {
+public abstract class RequestToCopy extends Message {
 
     /**
      * Путь к файлу на сервере.
