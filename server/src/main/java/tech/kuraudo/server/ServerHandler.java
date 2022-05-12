@@ -1,11 +1,9 @@
 package tech.kuraudo.server;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import tech.kuraudo.common.message.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -14,6 +12,8 @@ import java.io.RandomAccessFile;
  * что сообщения от него получены.
  */
 public class ServerHandler extends SimpleChannelInboundHandler< Message > {
+
+    private RandomAccessFile accessFile;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -33,24 +33,8 @@ public class ServerHandler extends SimpleChannelInboundHandler< Message > {
             if (!file.exists()) {
                 ctx.writeAndFlush(new LogMessage("File " + filePath + " + doesn't exists"));
             } else {
-                try (final RandomAccessFile accessFile = new RandomAccessFile(file, "r")) {
-                    while (accessFile.getFilePointer() != accessFile.length()) {
-                        final byte[] fileContent;
-                        final long available = accessFile.length() - accessFile.getFilePointer();
-                        if (available > 64 * 1024) {
-                            fileContent = new byte[64 * 1024];
-                        } else {
-                            fileContent = new byte[(int) available];
-                        }
-                        final long startPosition = accessFile.getFilePointer();
-                        accessFile.read(fileContent);
-                        final boolean last = (accessFile.getFilePointer() == accessFile.length());
-                        ctx.writeAndFlush(new FileContentMessage(fileContent, startPosition, last));
-                    }
-                    accessFile.getFilePointer();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                accessFile = new RandomAccessFile(file, "r");
+                sendFile(ctx);
             }
         }
     }
@@ -58,11 +42,44 @@ public class ServerHandler extends SimpleChannelInboundHandler< Message > {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Client disconnect");
+        if (accessFile != null) {
+            accessFile.close();
+        }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
         ctx.close();
+    }
+
+    private void sendFile(ChannelHandlerContext ctx) throws IOException {
+        if (accessFile == null) {
+            return;
+        }
+
+        final byte[] fileContent;
+        final long available = accessFile.length() - accessFile.getFilePointer();
+
+        if (available > 64 * 1024) {
+            fileContent = new byte[64 * 1024];
+        } else {
+            fileContent = new byte[(int) available];
+        }
+
+        final long startPosition = accessFile.getFilePointer();
+        accessFile.read(fileContent);
+        final boolean last = (accessFile.getFilePointer() == accessFile.length());
+        FileContentMessage message = new FileContentMessage(fileContent, startPosition, last);
+        ctx.channel().writeAndFlush(message).addListener((ChannelFutureListener) future -> {
+            if (!last) {
+                sendFile(ctx);
+            }
+        });
+
+        if (last) {
+            accessFile.close();
+            accessFile = null;
+        }
     }
 }
