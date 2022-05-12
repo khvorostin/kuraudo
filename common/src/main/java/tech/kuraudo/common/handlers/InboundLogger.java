@@ -15,6 +15,8 @@ public class InboundLogger extends StringDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List< Object > out) throws Exception {
         super.decode(ctx, msg, out);
-        System.out.println("INBOUND LOGGER: " + out);
+        if (out.toString().contains("LogMessage")) {
+            System.out.println("INBOUND LOGGER: " + out);
+        }
     }
 }

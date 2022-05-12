@@ -2,16 +2,22 @@ package tech.kuraudo.client;
 
 import tech.kuraudo.common.message.Message;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Пул сообщений, вспомогательный класс для передачи данных между объектами, отвечающими за взаимодействие
  * с пользователем (см. {@link Handler}) и сетевое взаимодействие (см. {@link Messager}).
+ *
+ * В один момент времени пул позволяет хранить только одно сообщение для каждого получателя.
+ * Следующее сообщение можно добавить только после того как предыдущее с будет получено.
  */
 public class MessagePool {
-    private Message message;
-    private boolean valueSet = false;
 
-    synchronized void put(Message message) {
-        while (valueSet) {
+    private Map<String, Message> pool = new HashMap<>();
+
+    synchronized void put(String subscriber, Message message) {
+        while (pool.containsKey(subscriber)) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -19,13 +25,12 @@ public class MessagePool {
             }
         }
 
-        this.message = message;
-        valueSet = true;
+        pool.put(subscriber, message);
         notify();
     }
 
-    synchronized Message get() {
-        while (!valueSet) {
+    synchronized Message get(String subscriber) {
+        while (!pool.containsKey(subscriber)) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -33,7 +38,7 @@ public class MessagePool {
             }
         }
 
-        valueSet = false;
+        Message message = pool.remove(subscriber);
         notify();
         return message;
     }
