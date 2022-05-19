@@ -113,6 +113,11 @@ public class Messager implements Runnable{
             while (channel.isActive()) {
                 Message message = messagePool.get(MODULE_NAME);
 
+                // Данные для регистрации пользователя на сервере
+                if (message instanceof RegMessage regMessage) {
+                    channel.writeAndFlush(regMessage);
+                }
+
                 // Данные для авторизации на сервере
                 if (message instanceof AuthMessage authMessage) {
                     channel.writeAndFlush(authMessage);
