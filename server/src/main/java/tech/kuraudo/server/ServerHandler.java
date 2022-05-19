@@ -37,6 +37,16 @@ public class ServerHandler extends SimpleChannelInboundHandler< Message > {
                 sendFile(ctx);
             }
         }
+
+        if (msg instanceof UploadContentMessage uploadContentMessage) {
+            File file = new File(uploadContentMessage.getPath());
+            final RandomAccessFile accessFile = new RandomAccessFile(file, "rw");
+            accessFile.seek(uploadContentMessage.getStartPosition());
+            accessFile.write(uploadContentMessage.getContent());
+            if (uploadContentMessage.isLast()) {
+                accessFile.close();
+            }
+        }
     }
 
     @Override
