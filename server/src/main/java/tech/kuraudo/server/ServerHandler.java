@@ -15,6 +15,13 @@ public class ServerHandler extends SimpleChannelInboundHandler< Message > {
 
     private RandomAccessFile accessFile;
 
+    private boolean userAuthorized = false;
+    private GateKeeper gateKeeper;
+
+    public ServerHandler() {
+        GateKeeper gateKeeper = new GateKeeper();
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         ctx.writeAndFlush(new LogMessage("Successfully connection"));
@@ -22,8 +29,25 @@ public class ServerHandler extends SimpleChannelInboundHandler< Message > {
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+        if (msg instanceof RegMessage regMessage) {
+            ctx.writeAndFlush(new LogMessage("Reg data for " + regMessage.getLogin() + " received"));
+            if (gateKeeper.checkIfUserExists(regMessage.getLogin())) {
+                ctx.writeAndFlush(new ActionResultMessage("Login already exists. Try another one"));
+            } else if (gateKeeper.registerUser(regMessage.getLogin(), regMessage.getPassword(), regMessage.getLogin())) {
+                ctx.writeAndFlush(new ActionResultMessage("New user register. Please log in to use Kuraudo"));
+            } else {
+                ctx.writeAndFlush(new ActionResultMessage("Something went wrong. Please, try again"));
+            }
+        }
+
         if (msg instanceof AuthMessage authMessage) {
             ctx.writeAndFlush(new LogMessage("Auth data for " + authMessage.getLogin() + " received"));
+            if (gateKeeper.authorizeUser(authMessage.getLogin(), authMessage.getPassword())) {
+                ctx.writeAndFlush(new ActionResultMessage("Success authorization"));
+                userAuthorized = true;
+            } else {
+                ctx.writeAndFlush(new ActionResultMessage("Something went wrong. Please, try again"));
+            }
         }
 
         if (msg instanceof FileRequestMessage fileRequestMessage) {
