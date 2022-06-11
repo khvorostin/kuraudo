@@ -1,23 +1,24 @@
-package tech.kuraudo.client;
+package tech.kuraudo.client.view.renderers;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 
-public class SizeRenderer extends DefaultTableCellRenderer {
+public class SizeRenderer extends KuraudoTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
         if (value instanceof Long) {
             Long size = (Long) value;
             String sizeAsString = convertSizeToString(size);
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             label.setText(sizeAsString);
             label.setHorizontalAlignment(JLabel.RIGHT);
             return label;
         }
 
-        return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        return label;
     }
 
     /**

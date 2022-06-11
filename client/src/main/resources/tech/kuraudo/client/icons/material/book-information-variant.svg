@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
+   version="1.1"
+   id="svg170"
+   sodipodi:docname="book-information-variant.svg"
+   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs174" />
+  <sodipodi:namedview
+     id="namedview172"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="47.291667"
+     inkscape:cx="12"
+     inkscape:cy="12"
+     inkscape:window-width="2560"
+     inkscape:window-height="1351"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg170" />
+  <path
+     fill="#6c707e"
+     d="M 12.00002,1.3333 H 8 V 5.99999 L 6.333325,4.999985 4.66665,5.99999 V 1.3333 H 3.99998 c -0.733337,0 -1.33334,0.600003 -1.33334,1.33334 v 10.66672 c 0,0.733337 0.600003,1.33334 1.33334,1.33334 h 8.00004 c 0.733337,0 1.33334,-0.600003 1.33334,-1.33334 V 2.66664 c 0,-0.7400037 -0.600003,-1.33334 -1.33334,-1.33334 m -0.213334,10.940055 c -0.07333,0.06 -0.806671,0.560002 -1.086673,0.72667 C 10.420012,13.193359 9.33334,13.813362 9.506674,12.613356 9.926676,10.186678 10.740014,8.74667 9.766676,9.37334 9.513341,9.526674 9.366673,9.620008 9.27334,9.666675 c -0.08667,0.07333 -0.08,0.06667 -0.153334,-0.06 -0.07333,-0.126668 -0.100001,-0.120001 -0.0067,-0.186668 0,0 1.486674,-1.193339 2.033343,-1.233339 0.520003,-0.04667 0.393336,0.593336 0.346669,0.886671 -0.306668,1.233339 -0.866671,3.026681 -0.780004,3.286683 0.07333,0.260001 0.620003,-0.153334 0.913338,-0.360002 0,0 0.04,-0.04667 0.113334,0.03333 0.07333,0.113334 0.146667,0.166668 0.04667,0.240002 M 11.31335,7.37333 c -0.380002,0 -0.68667,-0.306668 -0.68667,-0.68667 0,-0.380002 0.306668,-0.68667 0.68667,-0.68667 0.380002,0 0.68667,0.306668 0.68667,0.68667 0,0.380002 -0.306668,0.68667 -0.68667,0.68667 z"
+     id="path168"
+     style="stroke-width:0.66667" />
+</svg>
