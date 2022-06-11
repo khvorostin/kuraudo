@@ -76,15 +76,30 @@ public class Handler implements Runnable {
     }
 
     /**
-     * Запрашивает у пользователя логин и пароль для подключения к серверу, формирует сообщение для авторизации на сервере
-     * и бросает его в пул сообщений.
+     * Запрашивает у пользователя логин и пароль для подключения к серверу, формирует сообщение для авторизации
+     * или регистрации на сервере и бросает его в пул сообщений.
      */
     private void askCredentials() {
-        System.out.print("Enter the login: ");
-        String login = scanner.next();
-        System.out.print("Enter the password: ");
-        String password = scanner.next();
-        messagePool.put(Messager.MODULE_NAME, new AuthMessage(login, password));
+        System.out.println("Choose [1] to log in or [2] to register new user: ");
+        int choose = scanner.nextInt();
+        if (choose == 1 || choose == 2) {
+            System.out.print("Enter the login: ");
+            String login = scanner.next();
+            System.out.print("Enter the password: ");
+            String password = scanner.next();
+            switch (choose) {
+                case 1 -> messagePool.put(Messager.MODULE_NAME, new AuthMessage(login, password));
+                case 2 -> {
+                    if (!password.equals(scanner.next())) {
+                        System.out.println("Passwords not equal!");
+                    } else {
+                        System.out.print("Enter your email: ");
+                        String email = scanner.next();
+                        messagePool.put(Messager.MODULE_NAME, new RegMessage(login, password, email));
+                    }
+                }
+            }
+        }
     }
 
     /**

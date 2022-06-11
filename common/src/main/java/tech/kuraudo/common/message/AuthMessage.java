@@ -1,5 +1,8 @@
 package tech.kuraudo.common.message;
 
+/**
+ * Запрос аутентификации на сервере.
+ */
 public class AuthMessage extends Message {
     private String login;
     private String password;
